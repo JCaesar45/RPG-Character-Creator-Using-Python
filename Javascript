@@ -1,0 +1,68 @@
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('character-form');
+  const resultDiv = document.getElementById('result');
+  
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('name').value;
+    const strength = parseInt(document.getElementById('strength').value, 10);
+    const intelligence = parseInt(document.getElementById('intelligence').value, 10);
+    const charisma = parseInt(document.getElementById('charisma').value, 10);
+    
+    const result = createCharacter(name, strength, intelligence, charisma);
+    
+    if (result.startsWith('The character') || result.startsWith('All stats')) {
+      resultDiv.innerHTML = `<div class="error">${result}</div>`;
+    } else {
+      resultDiv.textContent = result;
+    }
+  });
+  
+  function createCharacter(name, strength, intelligence, charisma) {
+    // Validate name
+    if (typeof name !== 'string') {
+      return "The character name should be a string";
+    }
+    if (name.length > 10) {
+      return "The character name is too long";
+    }
+    if (name.includes(' ')) {
+      return "The character name should not contain spaces";
+    }
+    
+    // Validate stats
+    const stats = [strength, intelligence, charisma];
+    
+    // Check if all stats are integers
+    if (!stats.every(stat => Number.isInteger(stat))) {
+      return "All stats should be integers";
+    }
+    
+    // Check if all stats are within the valid range
+    if (stats.some(stat => stat < 1)) {
+      return "All stats should be no less than 1";
+    }
+    if (stats.some(stat => stat > 4)) {
+      return "All stats should be no more than 4";
+    }
+    
+    // Check if stats sum to 7
+    if (stats.reduce((a, b) => a + b, 0) !== 7) {
+      return "The character should start with 7 points";
+    }
+    
+    // Format the output
+    let result = [name];
+    
+    // Format each stat line
+    const statNames = ["STR", "INT", "CHA"];
+    for (let i = 0; i < stats.length; i++) {
+      const filledDots = '●'.repeat(stats[i]);
+      const emptyDots = '○'.repeat(10 - stats[i]);
+      result.push(`${statNames[i]} ${filledDots}${emptyDots}`);
+    }
+    
+    return result.join('\n');
+  }
+});
